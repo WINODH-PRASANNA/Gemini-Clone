@@ -140,3 +140,32 @@ const requestApiResponse = async (incomingMessageElement) => {
         incomingMessageElement.classList.remove("message-loading");
     }
 };
+
+const addCopyButtonToCodeBlocks = () => {
+    const codeBlocks = document.querySelectorAll('pre');
+    codeBlocks.forEach((block) => {
+        const codeElement = block.querySelector('code');
+        let language = [...codeElement.classList].find(cls => cls.startsWith('language-'))?.replace('language-', '') || 'Text';
+
+        const languagelable = document.createElement('div');
+        languagelable.innerText = language.charAt(0).toUpperCase() + language.slice(1);
+        languagelable.classList.add('code-language-lable');
+        block.appendChild(languagelable);
+
+        const copyBtn = document.createElement('btn');
+        copyBtn.innerHTML =`<i class="bx bx-copy"></i>`;
+        copyBtn.classList.add('code-copy-btn');
+        block.appendChild(copyBtn);
+
+        copyBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(codeElement.innerText).then (() => {
+                copyBtn.innerHTML = `<i class="bx bx-check"></i>`;
+                setTimeout(() => copyBtn.innerHTML = `<i class="bx bx-copy"></i>`, 2000);
+            }).catch(err => {
+                console.error("Copy failed:", err);
+                alert("Unable to copy text!");
+            });
+        });
+    });
+};
+
