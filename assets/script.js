@@ -16,7 +16,7 @@ const API_REQUEST_URL = `https://generativelanguage.googleapis.com/v1/models/gem
 
 
 const loadSavedChatHistory = () => {
-    const savedConversation = JSON.parse(localStorage.getItem("saved-api-chats")) || [];
+    const savedConversations = JSON.parse(localStorage.getItem("saved-api-chats")) || [];
     const isLightTheme = localStorage.getItem("theme-color") === "light_mode";
 
     document.body.classList.toggle("light_mode", isLightTheme);
@@ -24,7 +24,7 @@ const loadSavedChatHistory = () => {
 
     chatHistoryContainer.innerHTML = '';
 
-    savedConversation.forEach(conversation => {
+    savedConversations.forEach(conversation => {
         const userMessageHtml = `
 
             <div class="message-content">
@@ -54,8 +54,89 @@ const loadSavedChatHistory = () => {
             <span class="message-icon hide" onClick="copyMessageToClipboard(this)">
                 <i class='bx bx-copy-alt'></i>
             </span>
-        `
-    })
+        `;
+
+        const incomingMessageElement = createChatMessageElement(responseHtml, "message-incoming");
+
+        const messageTextElement = incomingMessageElement.querySelector(".message-text");
+
+        showTypingEffect(rawApiResponse, parsedApiResponse, messageTextElement, incomingMessageElement, true);
+    });
+
+    document.body.classList.toggle("hide-header", savedConversations.length > 0);
 };
 
-// 28.55
+
+const createChatMessageElement = (htmlContent, ...cssClasses) => {
+    const messageElement = document.createElement("div");
+    messageElement.classList.add("message", ...cssClasses);
+    messageElement.innerHTML = htmlContent;
+    return messageElement;
+}
+
+const showTypingEffect = (rawText, htmlText, messageElement, incomingMessageElement, skipEffect = false) => {
+    const copyIconElement = incomingMessageElement.querySelector(".message-icon");
+    copyIconElement.classList.add("hide");
+
+    if (skipEffect) {
+        messageElement.innerHTML = htmlText;
+        hljs.highlightAll();
+        addCopyButtonToCodeBlocks();
+        copyIconElement.classList.remove("hide");
+        isGeneratingResponse = false;
+        return;
+    }
+
+    const wordsArray = rawText.split(' ');
+    let wordIndex = 0;
+
+    const typingInterval = setInterval(() => {
+        messageElement.innerText += (wordIndex === 0 ? '' : ' ') + wordsArray[wordIndex++];
+        if (wordIndex === wordsArray.length) {
+            clearInterval(typingInterval);
+            isGeneratingResponse = false;
+            messageElement.innerHTML = htmlText;
+            hljs.highlightAll();
+            addCopyButtonToCodeBlocks();
+            copyIconElement.classList.remove("hide");
+        }
+    }, 75);
+};
+
+const requestApiResponse = async (incomingMessageElement) => {
+    const Messageelement = incomingMessageElement.querySelector(".message-text");
+
+    try {
+        const response = await fetch(API_REQUEST_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                contents: [{ role: "user", parts: [{ text: currentUserMessage }] }]
+            }),
+        });
+
+        const responseData = await response.json();
+        if (!response.ok) throw new Error(responseData.error.message);
+
+        const responseText = responseData?.conditates?.[0]?.content?.parts?.[0]?.text;
+        if (!responseText) throw new Error("Invalid API Response");
+
+        const parsedApiResponse = marked.parse(responseText);
+        const rawApiResponse = responseText;
+
+        showTypingEffect(rawApiResponse, parsedApiResponse, messageTextElement, incomingMessageElement);
+
+        let savedConversations = JSON.parse(localStorage.getItem("saved-api-chats")) || [];
+        savedConversations.push({
+            userMessage: currentUserMessage,
+            apiResponse: responseData
+        });
+        localStorage.setItem("saved-api-chats", JSON.stringify(savedConversations));
+    } catch (error) {
+        isGeneratingResponse = false;
+        messageTextElement.innerText = error.message;
+        messageTextElement.closest(".message-loading").classList.add("message-error");
+    } finally {
+        incomingMessageElement.classList.remove("message-loading");
+    }
+};
