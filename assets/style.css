@@ -1,11 +1,11 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
 
 * {
     margin: 0;
     padding: 0;
     outline: none;
     box-sizing: border-box;
-    font-family: "Inter", sans-serif;
+    font-family: "DM Sans", sans-serif;
 }
 
 :root {
@@ -322,7 +322,7 @@ body.hide-header .header {
     display: flex;
 }
 
-.chats .message-loading-indicator .message-loading-bar{
+.chats .message-loading-indicator .message-loading-bar {
     height: 1rem;
     width: 100%;
     border-radius: 0.135rem;
@@ -334,23 +334,26 @@ body.hide-header .header {
 .chats .message-loading-indicator .message-loading-bar:first-child {
     width: 85%;
 }
-.chats .message-loading-indicator .message-loading-bar:first-child{
+
+.chats .message-loading-indicator .message-loading-bar:first-child {
     width: 70%;
 }
 
 @keyframes loading {
-    0%{
+    0% {
         background-position: -800px 0;
     }
-    50%{
+
+    50% {
         background-position: 0px 0;
     }
-    100%{
+
+    100% {
         background-position: 800px 0;
     }
 }
 
-.code-copy-btn{
+.code-copy-btn {
     background: transparent;
     border: none;
     color: var(--text-clr);
@@ -363,32 +366,40 @@ body.hide-header .header {
     font-size: 18px;
 }
 
-p{
+p {
     margin-bottom: 10px;
 }
-ul{
+
+ul {
     list-style: disc inside;
     margin-left: 20px;
 }
-ol{
+
+ol {
     margin-left: 40px;
 }
-strong{
+
+strong {
     font-weight: bold;
 }
-em{
+
+em {
     font-style: italic;
 }
-a{
+
+a {
     color: #1e90ff;
     text-decoration: none;
 }
-th, td{
-    border: 1px solid ;
+
+th,
+td {
+    border: 1px solid;
     text-align: left;
     padding: 10px;
 }
-pre{
+
+pre {
     position: relative;
     background-color: var(--secondary-clr);
     padding: 10px 0 0;
@@ -398,12 +409,13 @@ pre{
     overflow-x: auto;
 }
 
-code{
+code {
     margin-top: 30px;
     border-radius: 5px;
     color: inherit;
 }
-.code-language-label{
+
+.code-language-label {
     position: absolute;
     font-weight: bold;
     top: 10px;
@@ -413,11 +425,11 @@ code{
     text-transform: capitalize;
 }
 
-.hljs{
+.hljs {
     background: var(--secondary-clr);
 }
 
-blockquote{
+blockquote {
     padding-left: 60px;
     line-height: 2.5rem;
     color: var(--text-clr);
